@@ -25,9 +25,12 @@ const audioPathByMemberId = {
   '975212351928274966': './audios/gb.mp3',
   '440201882326007818': './audios/joao.mp3',
 };
+const botId = '1153394926034354287';
+const memberNotStoredAudioPath = './audios/kiko.mp3';
 
 client.on('voiceStateUpdate', (oldState, newState) => {
   if (!newState.channel || oldState.channel) return;
+  if (newState.member.id === botId) return;
 
   const connection = joinVoiceChannel({
     channelId: newState.channelId,
@@ -35,16 +38,8 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     adapterCreator: newState.guild.voiceAdapterCreator,
   });
 
-  let resource;
-
   const audioPath = audioPathByMemberId[newState.member.id];
-
-  if (audioPath) {
-    resource = createAudioResource(createReadStream(audioPath));
-  } else {
-    if (newState.member.id === '1153394926034354287') return;
-    resource = createAudioResource(createReadStream('./audios/kiko.mp3'));
-  }
+  const resource = createAudioResource(createReadStream(audioPath || memberNotStoredAudioPath));
 
   const player = createAudioPlayer();
   player.play(resource);
